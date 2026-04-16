@@ -1,0 +1,19 @@
+# --- Environnement Virtuel ---
+.venv/
+venv/
+env/
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# --- Données Lourdes ---
+data/
+
+# --- IDE et Système ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
