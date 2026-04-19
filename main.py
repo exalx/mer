@@ -25,24 +25,26 @@ passes_config = [
     },
 ]
 
-# sat_pass_0 = SatellitePass.from_dict(passes_config[0])
-sat_pass_1 = SatellitePass.from_dict(passes_config[1])
-sat_pass_2 = SatellitePass.from_dict(passes_config[2])
+# --- CHOIX DES PASSAGES A AFFICHER ---
 
-sat_passes = [sat_pass_1, sat_pass_2]
+sat_passes = []
+render = [2]
+for i in render:
+    sat_passes.append(SatellitePass.from_dict(passes_config[i]))
+
 
 # --- LISTE PARAMETRES ---
 param = ["elevations, azimut, distance"]
 
 # --- PLOTS ---
 # --- 2D ---
-plot_xy(sat_passes, "elevations")
+# plot_xy(sat_passes, "elevations")
 
 # --- 3D ---
-plot_xyz(sat_passes, "azimut", "elevations")
+# plot_xyz(sat_passes, "azimut", "elevations")
 
 # --- Polar ---
-plot_polar(sat_passes)
+# plot_polar(sat_passes)
 
 # --- Binned Stats ---
-# plot_mer_bins(sat_passes, 5)
+plot_mer_bins(sat_passes, 5)
