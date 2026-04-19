@@ -23,12 +23,18 @@ passes_config = [
         "start": datetime(2026, 4, 17, 15, 17, 5, tzinfo=utc) - timedelta(hours=2),
         "label": "17/04 (15h17)"
     },
+    {
+        "tle": "data/2026_04_17_v/tle.txt",
+        "s_file": "data/2026_04_17_v/meteor_15-17-03_17-04-2026_v.s",
+        "start": datetime(2026, 4, 17, 15, 17, 3, tzinfo=utc) - timedelta(hours=2),
+        "label": "17/04 Antenne V (15h17)"
+    },
 ]
 
 # --- CHOIX DES PASSAGES A AFFICHER ---
 
 sat_passes = []
-render = [2]
+render = [2, 3]
 for i in render:
     sat_passes.append(SatellitePass.from_dict(passes_config[i]))
 
