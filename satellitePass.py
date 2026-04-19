@@ -38,7 +38,7 @@ class SatellitePass:
 
     def _load_tle(self):
         tle_lines = []
-        with open(self.tle_file, 'r', encoding='utf-16') as f:
+        with open(self.tle_file, 'r', encoding='utf-8') as f:
             for line in f:
                 clean_line = line.strip()
                 
