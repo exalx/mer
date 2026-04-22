@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from config import Config
 
 def plot_xy(sat_passes, x):
     plt.figure(figsize=(10, 5))
@@ -87,4 +88,40 @@ def plot_mer_bins(sat_passes, bin_size=10):
     plt.title(f"Analyse statistique du MER par bins de {bin_size}°")
     plt.grid(axis='y', linestyle='--', alpha=0.7)
     plt.xlim(0, 90)
+    plt.show()
+
+def plot_raw_data(sat_passes, time_offset=-1):
+    plt.figure(figsize=(9, 9))
+
+    for sat_pass in sat_passes:
+        # Récupération de l'instant à afficher
+        current_time = time_offset if time_offset >= 0 else sat_pass.duration // 2
+        start = current_time * Config.BYTES_PER_SEC
+        end = (current_time + 1) * Config.BYTES_PER_SEC
+
+        # Récupération des points
+        I = sat_pass.data[start:end:2] / 128
+        Q = sat_pass.data[start+1:end:2] / 128
+        
+        # Tracé des points reçus
+        plt.scatter(I, Q, s=1, alpha=0.03, label=f"Symboles {sat_pass.label}")
+    
+    # Ajout des frontières de décision
+    plt.axhline(0, color='black', linewidth=1.5)
+    plt.axvline(0, color='black', linewidth=1.5)
+    
+    # Mise en forme
+    plt.grid(True, linestyle='--', alpha=0.5)
+    plt.axis('equal')
+    plt.title("Analyse de la Constellation")
+    plt.xlabel("Canal In-phase (I)")
+    plt.ylabel("Canal Quadrature (Q)")
+    leg = plt.legend(loc='upper right', markerscale=2)
+    for lh in leg.legend_handles: 
+        if lh is not None: lh.set_alpha(1)
+    
+    # Limites pour bien voir les quadrants
+    plt.xlim(-1.2, 1.2)
+    plt.ylim(-1.2, 1.2)
+    
     plt.show()

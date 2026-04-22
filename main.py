@@ -34,7 +34,7 @@ passes_config = [
 # --- CHOIX DES PASSAGES A AFFICHER ---
 
 sat_passes = []
-render = [2, 3]
+render = [0, 1]
 for i in render:
     sat_passes.append(SatellitePass.from_dict(passes_config[i]))
 
@@ -46,11 +46,14 @@ param = ["elevations, azimut, distance"]
 # --- 2D ---
 # plot_xy(sat_passes, "elevations")
 
-# --- 3D ---
+# # --- 3D ---
 # plot_xyz(sat_passes, "azimut", "elevations")
 
-# --- Polar ---
+# # --- Polar ---
 # plot_polar(sat_passes)
 
 # --- Binned Stats ---
-plot_mer_bins(sat_passes, 5)
+# plot_mer_bins(sat_passes, 5)
+
+# --- Constellations ---
+plot_raw_data(sat_passes)

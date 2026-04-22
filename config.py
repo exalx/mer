@@ -4,6 +4,9 @@ from datetime import datetime, timedelta
 
 @dataclass
 class Config:
+    # Informations du satellite
+    NORAD_ID = 59051
+
     # Coordonnées du site de réception (Palaiseau)
     LAT = '48.7128 N'
     LON = '2.2101 E'
