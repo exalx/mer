@@ -1,6 +1,5 @@
 from dataclasses import dataclass
-from skyfield.api import Topos, load, EarthSatellite, utc
-from datetime import datetime, timedelta
+from skyfield.api import Topos
 
 @dataclass
 class Config:

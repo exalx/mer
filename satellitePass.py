@@ -1,11 +1,39 @@
 import numpy as np
 from config import Config
-from skyfield.api import Topos, load, EarthSatellite, utc
-from datetime import datetime, timedelta
+from skyfield.api import load, EarthSatellite
+from datetime import timedelta
 
 
 class SatellitePass:
+    """Encapsule les données d'un passage de satellite
+    """
     def __init__(self, label, date_start, tle_file, s_file):
+        """Initialise l'objet et calcule toutes données associées :
+        - label : Légende à afficher sur les graphiques.
+        - date_start : Instant de début de l'enregistrement.
+
+        - tle_file : URL vers le fichier '.txt' contenant les tle.
+        - tle_lines : Récupération des lignes TLE adaptée pour la librairie skyfield.api. Chargée après l'appel à _load_tle().
+
+        - s_file : URL vers le fichier '.s' de l'enregistrement.
+        - data : Liste des points I et Q obtenus depuis le fichier .s. Chargée après l'appel à _load_data().
+        
+        - duration : Temps total d'enregistrement.
+
+        - elevations : Liste des élévations à chaque instant (1 seconde) de l'enregistrement. Chargée après l'appel à _load_satellite_data().
+        - azimut : Liste des azimuts à chaque instant de l'enregistrement. Chargée après l'appel à _load_satellite_data().
+        - distance : Liste des distances satellites - antennet à chaque instant de l'enregistrement. Chargée après l'appel à _load_satellite_data().
+        - polar_coords : Liste des coordonnées cylindriques du satellite (élévation et azimut). Chargée après l'appel à _load_satellite_data().
+
+        - mer : Liste des MER à chaque instant de l'enregistrement. Calculée après l'appel à _load_mer().
+
+
+        Args:
+            label (String): Légende à afficher sur les graphiques.
+            date_start (datetime): Instant de début de l'enregistrement.
+            tle_file (String): URL vers le fichier '.txt' contenant les tle.
+            s_file (String): URL vers le fichier '.s' de l'enregistrement.
+        """
         self.label = label
         self.date_start = date_start
 
@@ -30,6 +58,14 @@ class SatellitePass:
 
     @classmethod
     def from_dict(cls, data_dict):
+        """Permet de générer un objet de la classe SatellitePass à partir d'un dictionnaire.
+
+        Args:
+            data_dict (dict): Dictionnaire contenant les classes 'label', 'start', 'tle' et 's_file' qui caractérise le passage du satellite.
+
+        Returns:
+            SatellitePass: Objet SatellitePass associé.
+        """
         label = data_dict['label']
         date_start = data_dict['start']
         tle_file = data_dict['tle']
@@ -37,6 +73,12 @@ class SatellitePass:
         return cls(label, date_start, tle_file, s_file)
 
     def _load_tle(self):
+        """Permet de récupérer les TLE au format requis par la librairie qui les traite.
+        ATTENTION, le fichier tle.txt doit être enregistré sous encoding : 'utf-8'.
+
+        Raises:
+            ValueError: Si le fichier contient moins de 2 lignes.
+        """
         tle_lines = []
         with open(self.tle_file, 'r', encoding='utf-8') as f:
             for line in f:
@@ -56,13 +98,18 @@ class SatellitePass:
         self.tle_lines = tle_lines
     
     def _load_data(self):
+        """Convertit le fichier .s en une liste d'entiers exploitables.
+        """
         self.data = np.fromfile(self.s_file, dtype=np.int8).astype(np.float32)
     
     def _load_satellite_data(self):
+        """Récupère toutes les données de position du satellite à partir de la libraire skyfield.api.
+        """
         ts = load.timescale()
         line1, line2, *_ = self.tle_lines
         satellite = EarthSatellite(line1, line2, 'METEOR-M2 4', ts)
 
+        # Récupération à chaque instant de l'enregistrement
         for i in range(self.duration):
             t = ts.from_datetime(self.date_start + timedelta(seconds=i))
             difference = satellite - Config.PALAISEAU
@@ -82,6 +129,8 @@ class SatellitePass:
 
 
     def _load_mer(self):
+        """Calcule le MER à chaque instant de l'enregistrement.
+        """
         for i in range(self.duration):
             start = i * Config.BYTES_PER_SEC
             end = (i + 1) * Config.BYTES_PER_SEC
@@ -109,6 +158,14 @@ class SatellitePass:
             self.mer.append(10 * np.log10(P_signal / P_erreur))
 
     def get_binned_stats(self, bin_size : int =10):
+        """Regroupe les élévations et les MER pour les moyenner.
+
+        Args:
+            bin_size (int, optional): Taille de l'intervalle sur lequel les moyennes sont effectuées. Defaults to 10.
+
+        Returns:
+            list: Renvoit centre, écart-type sur le MER en fonction des intervalles d'élévations.
+        """
         bins = np.arange(0, 91, bin_size)
         indices = np.digitize(self.elevations, bins)
 

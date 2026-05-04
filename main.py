@@ -6,6 +6,12 @@ from datetime import datetime, timedelta
 # --- INITIALISATION PASS ---
 passes_config = [
     {
+        "tle": "data/2025_09_17/tle.txt",
+        "s_file": "data/2025_09_17/meteor_16-39-39_17-09-2025.s",
+        "start": datetime(2025, 9, 17, 16, 39, 39, tzinfo=utc) - timedelta(hours=2),
+        "label": "17/09 (16h39) Antenne en V"       
+    },
+    {
         "tle": "data/2026_03_18/tle.txt",
         "s_file": "data/2026_03_18/meteor_15-07-43_18-03-2026.s",
         "start": datetime(2026, 3, 18, 15, 7, 43, tzinfo=utc) - timedelta(hours=1),
@@ -27,27 +33,30 @@ passes_config = [
         "tle": "data/2026_04_17_v/tle.txt",
         "s_file": "data/2026_04_17_v/meteor_15-17-03_17-04-2026_v.s",
         "start": datetime(2026, 4, 17, 15, 17, 3, tzinfo=utc) - timedelta(hours=2),
-        "label": "17/04 Antenne V (15h17)"
+        "label": "17/04 (15h17) Antenne en V"
     },
 ]
 
 # --- CHOIX DES PASSAGES A AFFICHER ---
+# Modifier la liste 'render' pour choisir les passages à afficher en fonction du dictionnaire ci-dessus.
 
 sat_passes = []
-render = [0, 1]
+render = [1,2,3]
 for i in render:
     sat_passes.append(SatellitePass.from_dict(passes_config[i]))
 
 
 # --- LISTE PARAMETRES ---
-param = ["elevations, azimut, distance"]
+param = ["elevations", "azimut", "distance"]
 
 # --- PLOTS ---
+# Commenter et décommenter chaque ligne pour générer ou non les graphiques.
+
 # --- 2D ---
-# plot_xy(sat_passes, "elevations")
+plot_xy(sat_passes, "elevations")
 
 # # --- 3D ---
-# plot_xyz(sat_passes, "azimut", "elevations")
+plot_xyz(sat_passes, "azimut", "elevations")
 
 # # --- Polar ---
 # plot_polar(sat_passes)
@@ -56,4 +65,4 @@ param = ["elevations, azimut, distance"]
 # plot_mer_bins(sat_passes, 5)
 
 # --- Constellations ---
-plot_raw_data(sat_passes)
+# plot_raw_data(sat_passes)
